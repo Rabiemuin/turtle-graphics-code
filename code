@@ -1,0 +1,169 @@
+package uk.ac.leedsbeckett.oop;
+
+import uk.ac.leedsbeckett.oop.LBUGraphics;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+
+public class TurtleGraphics extends LBUGraphics
+{
+    String history = "";
+    boolean saved = true;
+
+    public TurtleGraphics()
+    {
+       JFrame f = new JFrame("Turtle");
+       f.add(this);
+       f.setSize(800,400);
+       f.setVisible(true);
+    }
+
+    // Requirement 26 – override about
+    @Override
+    public void about()
+    {
+       super.about();
+       displayMessage("Made by STUDENT NAME");
+    }
+
+    @Override
+    public void processCommand(String cmd)
+    {
+       history += cmd + "\n";
+       saved = false;
+
+       String[] p = cmd.toLowerCase().split(" ");
+
+       try
+       {
+          switch(p[0])
+          {
+             case "about": about(); break;
+
+             case "pendown": penDown(); break;
+             case "penup": penUp(); break;
+
+             // move 100
+             case "move":
+                forward(Integer.parseInt(p[1]));
+                break;
+
+             // reverse 100
+             case "reverse":
+                forward(-Integer.parseInt(p[1]));
+                break;
+
+             // left 90
+             case "left":
+                turnLeft(Integer.parseInt(p[1]));
+                break;
+
+             // right 90
+             case "right":
+                turnRight(Integer.parseInt(p[1]));
+                break;
+
+             // colours
+             case "red": setPenColour(Color.RED); break;
+             case "green": setPenColour(Color.GREEN); break;
+             case "blue": setPenColour(Color.BLUE); break;
+             case "black": setPenColour(Color.BLACK); break;
+
+             case "clear":
+                checkSave();
+                clear();
+                break;
+
+             case "reset":
+                reset();
+                break;
+
+             // square 100
+             case "square":
+                int s = Integer.parseInt(p[1]);
+                for(int i=0;i<4;i++)
+                {
+                   forward(s);
+                   turnRight(90);
+                }
+                break;
+
+             // triangle 80
+             case "triangle":
+                int t = Integer.parseInt(p[1]);
+                for(int i=0;i<3;i++)
+                {
+                   forward(t);
+                   turnRight(120);
+                }
+                break;
+
+             // pen 100 0 200
+             case "pen":
+                setPenColour(new Color(
+                      Integer.parseInt(p[1]),
+                      Integer.parseInt(p[2]),
+                      Integer.parseInt(p[3])));
+                break;
+
+             // penwidth 5
+             case "penwidth":
+                setStroke(Integer.parseInt(p[1]));
+                break;
+
+             // save commands
+             case "save":
+                FileWriter fw = new FileWriter("commands.txt");
+                fw.write(history);
+                fw.close();
+                saved = true;
+                displayMessage("Saved");
+                break;
+
+             // load commands
+             case "load":
+                BufferedReader br =
+                      new BufferedReader(new FileReader("commands.txt"));
+                String line;
+                while((line = br.readLine()) != null)
+                   processCommand(line);
+                br.close();
+                break;
+
+             default:
+                displayMessage("Invalid command");
+          }
+       }
+       catch(ArrayIndexOutOfBoundsException e)
+       {
+          displayMessage("Missing parameter");
+       }
+       catch(NumberFormatException e)
+       {
+          displayMessage("Parameter must be number");
+       }
+       catch(Exception e)
+       {
+          displayMessage("Out of bounds");
+       }
+    }
+
+    private void turnRight(int i) {
+    }
+
+    private void penUp() {
+    }
+
+    private void penDown() {
+    }
+
+    private void turnLeft(int i) {
+    }
+
+    // warning before clear
+    void checkSave()
+    {
+       if(!saved)
+          JOptionPane.showMessageDialog(null,"Not saved!");
+    }
+}
